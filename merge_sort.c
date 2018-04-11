@@ -3,44 +3,49 @@
 #include <string.h>
 #include "sort.h"
 
-int * merge_sort(int *array, int array_size);
-int * merge(int *left, int *right, int left_size, int right_size);
+int *merge_sort(int *array, int array_size);
+int *merge(int *left, int *right, int left_size, int right_size);
 
 int main(int argc, char **argv) {
   int *array;
   int *sorted_array;
   int array_size;
+  int output = 1;
 
   if (argc < 2) {
     printf("Usage: %s [size of list]\n", argv[0]);
     return 1;
   }
+  if (argc >= 3 && !strcmp(argv[2], "-q")) {
+    output = 0;
+  }
 
   array_size = atoi(argv[1]);
   fill_array(&array, array_size);
-  /*print_array(array, array_size);*/
 
-  sorted_array = calloc(array_size, sizeof(int));
+  if (output) {
+    print_array(array, array_size);
+  }
 
   sorted_array = merge_sort(array, array_size);
-  /*int sorted_left[1] = {187};*/
-  /*int sorted_right[1] = {3};*/
 
-  /*sorted_array = merge(sorted_left, sorted_right, 1, 1);*/
+  if (output) {
+    print_array(sorted_array, array_size);
+  }
 
-  /*print_array(sorted_array, array_size);*/
   printf("Done\n");
+
+  free(sorted_array);
+  free(array);
 
   return 0;
 }
 
-int * merge_sort(int *array, int array_size) {
-  int *merged = calloc(array_size, sizeof(int));
-  int middle;
+int *merge_sort(int *array, int array_size) {
   int *left;
   int *right;
-  int *sorted_left;
-  int *sorted_right;
+  int *merged;
+  int middle;
   int left_size;
   int right_size;
 
@@ -51,83 +56,43 @@ int * merge_sort(int *array, int array_size) {
   middle = (array_size + 1) / 2;
   left_size = middle;
   right_size = array_size - middle;
-  left = calloc(left_size, sizeof(int));
-  right = calloc(right_size, sizeof(int));
 
-  sorted_left = calloc(left_size, sizeof(int));
-  sorted_right = calloc(right_size, sizeof(int));
+  left = malloc(left_size * sizeof(int));
+  right = malloc(right_size * sizeof(int));
 
   /* split array in half */
-  for (int i = 0; i < array_size; i++) {
-    if (i < middle) {
-      left[i] = array[i];
-    } else {
-      right[i - middle] = array[i];
-    }
-    /*printf(" %d ", array[i]);*/
-  }
-  /*printf("\n");*/
-
-  /* print left array */
-  /*for (int i = 0; i < left_size; i++) {*/
-    /*printf(" %d ", left[i]);*/
-  /*}*/
-  /*printf("\n");*/
-
-  /* print right array */
-  /*for (int i = 0; i < right_size; i++) {*/
-    /*printf(" %d ", right[i]);*/
-  /*}*/
-  /*printf("\n");*/
+  memcpy(left, array, left_size * sizeof(int));
+  memcpy(right, array + left_size, right_size * sizeof(int));
   
-  sorted_left = merge_sort(left, left_size);
-  sorted_right = merge_sort(right, right_size);
+  left = merge_sort(left, left_size);
+  right = merge_sort(right, right_size);
 
-  merged = merge(sorted_left, sorted_right, left_size, right_size);
+  merged = merge(left, right, left_size, right_size);
+
+  free(left);
+  free(right);
 
   return merged;
 }
 
-int * merge(int *left, int *right, int left_size, int right_size) {
+int *merge(int *left, int *right, int left_size, int right_size) {
   int *merged = calloc(left_size + right_size, sizeof(int));
 
   int lp = 0;
   int rp = 0;
 
-  /*printf("left array - ");*/
-  /*print_array(left, left_size);*/
-
-  /*printf("right array - ");*/
-  /*print_array(right, right_size);*/
-
-  /* [todo] merge them.. */
   for (int i = 0; i < left_size + right_size; i++) {
-
-    /*printf("left[%d] - %d\n", lp, left[lp]);*/
-    /*printf("right[%d] - %d\n", rp, right[rp]);*/
-
-    if (lp >= left_size) {
-      /*printf("higher than left_size - i: %d\n", i);*/
+    if (lp == left_size) {
       merged[i] = right[rp++];
       continue;
     }
-    if (rp >= right_size) {
-      /*printf("higher than right_size - i: %d\n", i);*/
+    if (rp == right_size) {
       merged[i] = left[lp++];
       continue;
     }
 
-    if (left[lp] < right[rp]) {
-      /*printf("setting merged[%d]: left[%d]\n", i, lp);*/
-      merged[i] = left[lp++];
-    } else {
-      /*printf("setting merged[%d]: right[%d]\n", i, rp);*/
-      merged[i] = right[rp++];
-    }
-
+    merged[i] = left[lp] < right[rp] ? left[lp++] : right[rp++];
   }
-  /*printf("merged array - ");*/
-  /*print_array(merged, left_size + right_size);*/
 
   return merged;
 }
