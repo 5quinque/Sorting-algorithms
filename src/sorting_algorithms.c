@@ -1,44 +1,43 @@
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "sort.h"
+#include "sorting_algorithms.h"
 
-int *merge_sort(int *array, int array_size);
-int *merge(int *left, int *right, int left_size, int right_size);
+void insert(int *array, int array_size) {
+  int left = 0;
+  int tmp;
 
-int main(int argc, char **argv) {
-  int *array;
-  int *sorted_array;
-  int array_size;
-  int output = 1;
+  for (int i = 0; i < array_size; i++) {
+    if (array[i] > array[i - 1])
+      continue;
 
-  if (argc < 2) {
-    printf("Usage: %s [size of list]\n", argv[0]);
-    return 1;
+    left = i;
+    tmp = array[i];
+
+    while (left > 0 && tmp < array[--left]) {
+      array[left + 1] = array[left];
+      array[left] = tmp;
+    }
   }
-  if (argc >= 3 && !strcmp(argv[2], "-q")) {
-    output = 0;
+}
+
+void bubble(int *array, int array_size) {
+  int swapped = 1;
+  int tmp;
+
+  while (swapped) {
+    swapped = 0;
+    for (int i = 0; i < array_size - 1; i++) {
+      /*if (array[i] <= array[i + 1]) {*/
+        /*continue;*/
+      /*}*/
+      if (array[i] > array[i + 1]) {
+        swapped = 1;
+        tmp = array[i];
+        array[i] = array[i + 1];
+        array[i + 1] = tmp;
+      }
+    }
   }
-
-  array_size = atoi(argv[1]);
-  fill_array(&array, array_size);
-
-  if (output) {
-    print_array(array, array_size);
-  }
-
-  sorted_array = merge_sort(array, array_size);
-
-  if (output) {
-    print_array(sorted_array, array_size);
-  }
-
-  printf("Done\n");
-
-  free(sorted_array);
-  free(array);
-
-  return 0;
 }
 
 int *merge_sort(int *array, int array_size) {
@@ -95,4 +94,20 @@ int *merge(int *left, int *right, int left_size, int right_size) {
   }
 
   return merged;
+}
+
+void selection(int *array, int array_size) {
+  int lowest;
+  int tmp;
+
+  for (int i = 0; i < array_size; i++) {
+    lowest = i;
+    for (int j = i; j < array_size; j++) {
+      if (array[j] < array[lowest])
+        lowest = j;
+    }
+    tmp = array[i];
+    array[i] = array[lowest];
+    array[lowest] = tmp;
+  }
 }

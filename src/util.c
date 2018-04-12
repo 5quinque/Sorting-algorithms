@@ -2,6 +2,8 @@
 #include <time.h>
 #include <stdlib.h>
 
+int srand_init = 0;
+
 void print_array(int *array, int array_size) {
   for (int i = 0; i < array_size; i++) {
     printf(" %d ", array[i]);
@@ -10,7 +12,14 @@ void print_array(int *array, int array_size) {
 }
 
 void fill_array(int **array, int array_size) {
-  srand(time(NULL));
+  if (!srand_init) {
+    srand(time(NULL));
+    srand_init = 1;
+  }
+
+  if (*array != NULL)
+    free(*array);
+  
   *array = calloc(array_size, sizeof(int));
 
   for (int i = 0; i < array_size; i++) {
